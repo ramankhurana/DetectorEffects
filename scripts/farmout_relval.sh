@@ -1,0 +1,1 @@
+farmoutAnalysisJobs METHistoGramFilesRelValTTBarleptonic  --input-dir=root://cmsxrootd.hep.wisc.edu//store/user/khurana/RelValTTBar /home/khurana/WorkingDir/CMSSW_7_0_6_patch1/ /home/khurana/WorkingDir/CMSSW_7_0_6_patch1/src/METTails/DetectorEffects/main.exe --fwklite --input-files-per-job=1
