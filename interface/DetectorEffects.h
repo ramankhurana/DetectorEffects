@@ -108,6 +108,15 @@ public :
    TH2F* GenHAD_vs_RecoChHAD;
    TH2F* GenHAD_vs_RecoHAD;
    
+   // Fill the energy fractions
+   TH1F* RecoPhoEF;
+   TH1F* RecoCEmEF;
+   TH1F* RecoCHadEF;
+   TH1F* RecoNEmEF;
+   TH1F* RecoNHadEF;
+   TH1F* GenEM;
+   TH1F* GenHad;
+
    
    // Declaration of leaf types
    Int_t           info_isData;
