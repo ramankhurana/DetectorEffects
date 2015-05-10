@@ -116,7 +116,8 @@ public :
    TH1F* RecoNHadEF;
    TH1F* GenEM;
    TH1F* GenHad;
-
+   
+   TH1F* drmatched;
    
    // Declaration of leaf types
    Int_t           info_isData;

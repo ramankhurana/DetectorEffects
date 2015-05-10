@@ -91,6 +91,9 @@ void DetectorEffects::Loop(TString outfilename)
 				(*AK5genjetPz)[j],
 				(*AK5genjetEn)[j]);
 	  
+	  
+	  drmatched->Fill((*AK5matchedDR)[j]);
+	  
 	  //bool isEventFound = FindEvent(GENJET_p4.Eta(), GENJET_p4.Phi());
 	  //bool isEventFound = (TMath::Abs (GENJET_p4.Eta()) > 1.2 ) && (TMath::Abs (GENJET_p4.Eta()) < 1.5 );
 	  //bool isEventFound = (TMath::Abs (GENJET_p4.Eta()) >  2.4 );
@@ -270,6 +273,7 @@ void DetectorEffects::Loop(TString outfilename)
   RecoNHadEF                                   ->Write();
   GenEM                                        ->Write();
   GenHad                                       ->Write();
+  drmatched                                    ->Write();
   f->Close();
   std::cout<<" file closed and job finished"<<std::endl;
 }
@@ -344,6 +348,7 @@ void DetectorEffects::MakeHistos(){
   RecoNHadEF  = new TH1F("RecoNHadEF","RecoNHadEF;RecoNHadEF;# of Events",100,0.,2.);
   GenEM       = new TH1F("GenEM","GenEM;GenEM;# of Events",100,0.,2.);
   GenHad      = new TH1F("GenHad","GenHad;GenHad;# of Events",100,0.,2.);
+  drmatched   = new TH1F("drmatched","drmatched;#Delta R;# of Events",100,0,5.);
 }
 
 
