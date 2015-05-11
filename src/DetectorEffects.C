@@ -164,15 +164,31 @@ void DetectorEffects::Loop(TString outfilename)
 	    //  if( (DeltaPt_*GENJET_p4.Pt()) > 50.0) { 
 	    
 	    // Fill th energy fractions for reco jets
-	    RecoPhoEF   ->Fill((*AK5jetPhoEF)[j]);
-	    RecoCEmEF   ->Fill((*AK5jetCEmEF)[j]);
-	    RecoCHadEF  ->Fill((*AK5jetCHadEF)[j]);
-	    RecoNEmEF   ->Fill((*AK5jetNEmEF)[j]);
-	    RecoNHadEF  ->Fill((*AK5jetNHadEF)[j]);
+	    float energy = RECOJET_p4.Energy();
+	    RecoPhoEF   ->Fill((*AK5jetPhoEF)[j]*energy);
+	    RecoCEmEF   ->Fill((*AK5jetCEmEF)[j]*energy);
+	    RecoCHadEF  ->Fill((*AK5jetCHadEF)[j]*energy);
+	    RecoNEmEF   ->Fill((*AK5jetNEmEF)[j]*energy);
+	    RecoNHadEF  ->Fill((*AK5jetNHadEF)[j]*energy);
 	    
 	    // Fill energy fractions for gen jets
-	    GenEM       ->Fill((*AK5genjetEM)[j]/GENJET_p4.Energy());
-	    GenHad      ->Fill((*AK5genjetHAD)[j]/GENJET_p4.Energy());
+	    GenEM       ->Fill((*AK5genjetEM)[j]);
+	    GenHad      ->Fill((*AK5genjetHAD)[j]);
+	    
+	    // Fill Profiles 
+	    // Fill th energy fractions for reco jets
+	    float genpt = GENJET_p4.Pt();
+	    float recpt = RECOJET_p4.Pt();
+	    RecoPhoEF_p   ->Fill(genpt,(*AK5jetPhoEF)[j]*energy);
+	    RecoCEmEF_p   ->Fill(genpt,(*AK5jetCEmEF)[j]*energy);
+	    RecoCHadEF_p  ->Fill(genpt,(*AK5jetCHadEF)[j]*energy);
+	    RecoNEmEF_p   ->Fill(genpt,(*AK5jetNEmEF)[j]*energy);
+	    RecoNHadEF_p  ->Fill(genpt,(*AK5jetNHadEF)[j]*energy);
+	    
+	    // Fill energy fractions for gen jets
+	    GenEM_p       ->Fill(genpt,(*AK5genjetEM)[j]);
+	    GenHad_p      ->Fill(genpt,(*AK5genjetHAD)[j]);
+	    
 	    
 	    //
 	    eta_vs_phi_profile_dPt_DilutedpT->Fill(GENJET_p4.Eta(), GENJET_p4.Phi(), DeltaPt_);
@@ -273,6 +289,13 @@ void DetectorEffects::Loop(TString outfilename)
   RecoNHadEF                                   ->Write();
   GenEM                                        ->Write();
   GenHad                                       ->Write();
+  RecoPhoEF_p                                  ->Write();
+  RecoCEmEF_p                                  ->Write();
+  RecoCHadEF_p                                 ->Write();
+  RecoNEmEF_p                                  ->Write();
+  RecoNHadEF_p                                 ->Write();
+  GenEM_p                                      ->Write();
+  GenHad_p                                     ->Write();
   drmatched                                    ->Write();
   f->Close();
   std::cout<<" file closed and job finished"<<std::endl;
@@ -341,14 +364,25 @@ void DetectorEffects::MakeHistos(){
   GenHAD_vs_RecoHAD_Dilute_dpT       = new TH2F("GenHAD_vs_RecoHAD_Dilute_dpT","GenHAD_vs_RecoHAD_Dilute_dpT;Had_{gen};Had_{reco}",100,0,1,100,0,1);
   GenHAD_vs_RecoChHAD_Dilute_dpT     = new TH2F("GenHAD_vs_RecoChHAD_Dilute_dpT","GenHAD_vs_RecoChHAD_Dilute_dpT;Had_{gen};Had_{reco}",100,0,1,100,0,1);
 
-  RecoPhoEF   = new TH1F("RecoPhoEF","RecoPhoEF;RecoPhoEF;# of Events",100,0,2.0);
-  RecoCEmEF   = new TH1F("RecoCEmEF","RecoCEmEF;RecoCEmEF;# of Events",100,0.,2.);
-  RecoCHadEF  = new TH1F("RecoCHadEF","RecoCHadEF;RecoCHadEF;# of Events",100,0.,2.);
-  RecoNEmEF   = new TH1F("RecoNEmEF","RecoNEmEF;RecoNEmEF;# of Events",100,0.,2.);
-  RecoNHadEF  = new TH1F("RecoNHadEF","RecoNHadEF;RecoNHadEF;# of Events",100,0.,2.);
-  GenEM       = new TH1F("GenEM","GenEM;GenEM;# of Events",100,0.,2.);
-  GenHad      = new TH1F("GenHad","GenHad;GenHad;# of Events",100,0.,2.);
-  drmatched   = new TH1F("drmatched","drmatched;#Delta R;# of Events",100,0,5.);
+  RecoPhoEF   = new TH1F("RecoPhoEF","RecoPhoEF;RecoPhoEF;# of Events",20,0,1000.0);
+  RecoCEmEF   = new TH1F("RecoCEmEF","RecoCEmEF;RecoCEmEF;# of Events",20,0.,1000.);
+  RecoCHadEF  = new TH1F("RecoCHadEF","RecoCHadEF;RecoCHadEF;# of Events",20,0.,1000.);
+  RecoNEmEF   = new TH1F("RecoNEmEF","RecoNEmEF;RecoNEmEF;# of Events",20,0.,1000.);
+  RecoNHadEF  = new TH1F("RecoNHadEF","RecoNHadEF;RecoNHadEF;# of Events",20,0.,1000.);
+  GenEM       = new TH1F("GenEM","GenEM;GenEM;# of Events",20,0.,1000.);
+  GenHad      = new TH1F("GenHad","GenHad;GenHad;# of Events",20,0.,1000.);
+
+
+
+  RecoPhoEF_p   = new TProfile("RecoPhoEF_p","RecoPhoEF_p;p_{T}^{genJet};RecoPhoEF",24,0,1200,0,1000.);
+  RecoCEmEF_p   = new TProfile("RecoCEmEF_p","RecoCEmEF_p;p_{T}^{genJet};RecoCEmEF",24,0,1200,0,1000.);
+  RecoCHadEF_p  = new TProfile("RecoCHadEF_p","RecoCHadEF_p;p_{T}^{genJet};RecoCHadEF",24,0,1200,0,1000.);
+  RecoNEmEF_p   = new TProfile("RecoNEmEF_p","RecoNEmEF_p;p_{T}^{genJet};RecoNEmEF",24,0,1200,0,1000.);
+  RecoNHadEF_p  = new TProfile("RecoNHadEF_p","RecoNHadEF_p;p_{T}^{genJet};RecoNHadEF",24,0,1200,0,1000.);
+  GenEM_p       = new TProfile("GenEM_p","GenEM_p;p_{T}^{genJet};GenEM",24,0,1200,0,1000.);
+  GenHad_p      = new TProfile("GenHad_p","GenHad_p;p_{T}^{genJet};GenHad",24,0,1200,0,1000.);
+  
+  drmatched   = new TH1F("drmatched","drmatched;#Delta R;# of Events",20,0,0.5);
 }
 
 

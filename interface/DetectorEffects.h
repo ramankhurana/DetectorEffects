@@ -116,7 +116,16 @@ public :
    TH1F* RecoNHadEF;
    TH1F* GenEM;
    TH1F* GenHad;
-   
+
+
+   TProfile* RecoPhoEF_p;
+   TProfile* RecoCEmEF_p;
+   TProfile* RecoCHadEF_p;
+   TProfile* RecoNEmEF_p;
+   TProfile* RecoNHadEF_p;
+   TProfile* GenEM_p;
+   TProfile* GenHad_p;
+
    TH1F* drmatched;
    
    // Declaration of leaf types
