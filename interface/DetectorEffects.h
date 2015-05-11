@@ -72,6 +72,7 @@ public :
    
    TH2F* dPhi_vs_MET_DilutedpT;
    TH2F* dPhi_vs_METOverdpT_DilutedpT;
+   TH2F* Eta_vs_METOverdpT_DilutedpT;
    TH2F* deltapt_vs_eta;
    TH2F* deltapt_vs_phi;
    
@@ -117,7 +118,12 @@ public :
    TH1F* GenEM;
    TH1F* GenHad;
 
-
+   TH1F* GenEM_Minus_RecoPho;
+   TH1F* GenHad_Minus_RecoChHad;
+   TH1F* GenHad_Minus_RecoHad;
+   
+   TH2F* MEM_vs_MHad;
+   
    TProfile* RecoPhoEF_p;
    TProfile* RecoCEmEF_p;
    TProfile* RecoCHadEF_p;

@@ -175,19 +175,31 @@ void DetectorEffects::Loop(TString outfilename)
 	    GenEM       ->Fill((*AK5genjetEM)[j]);
 	    GenHad      ->Fill((*AK5genjetHAD)[j]);
 	    
+	    float recopho     = (*AK5jetPhoEF)[j]*energy;
+	    float recoCHad    = (*AK5jetCHadEF)[j]*energy;
+	    float recoNHad   = (*AK5jetNHadEF)[j]*energy; 
+	    float genem       = (*AK5genjetEM)[j];
+	    float genhad      = (*AK5genjetHAD)[j];
+	    
+	    GenEM_Minus_RecoPho    ->Fill(genem - recopho);
+	    GenHad_Minus_RecoChHad ->Fill(genhad - recoCHad);
+	    GenHad_Minus_RecoHad   ->Fill(genhad - recoCHad - recoNHad);
+	    
+	    MEM_vs_MHad            ->Fill((genem - recopho), (genhad - recoCHad - recoNHad));
 	    // Fill Profiles 
 	    // Fill th energy fractions for reco jets
 	    float genpt = GENJET_p4.Pt();
-	    float recpt = RECOJET_p4.Pt();
-	    RecoPhoEF_p   ->Fill(genpt,(*AK5jetPhoEF)[j]*energy);
-	    RecoCEmEF_p   ->Fill(genpt,(*AK5jetCEmEF)[j]*energy);
-	    RecoCHadEF_p  ->Fill(genpt,(*AK5jetCHadEF)[j]*energy);
-	    RecoNEmEF_p   ->Fill(genpt,(*AK5jetNEmEF)[j]*energy);
-	    RecoNHadEF_p  ->Fill(genpt,(*AK5jetNHadEF)[j]*energy);
+	    RecoPhoEF_p   ->Fill(genpt,(*AK5jetPhoEF)[j]);
+	    RecoCEmEF_p   ->Fill(genpt,(*AK5jetCEmEF)[j]);
+	    RecoCHadEF_p  ->Fill(genpt,(*AK5jetCHadEF)[j]);
+	    RecoNEmEF_p   ->Fill(genpt,(*AK5jetNEmEF)[j]);
+	    RecoNHadEF_p  ->Fill(genpt,(*AK5jetNHadEF)[j]);
 	    
 	    // Fill energy fractions for gen jets
-	    GenEM_p       ->Fill(genpt,(*AK5genjetEM)[j]);
-	    GenHad_p      ->Fill(genpt,(*AK5genjetHAD)[j]);
+	    float genen = GENJET_p4.Energy();
+	    GenEM_p       ->Fill(genpt,(*AK5genjetEM)[j]/genen);
+	    GenHad_p      ->Fill(genpt,(*AK5genjetHAD)[j]/genen);
+	    
 	    
 	    
 	    //
@@ -196,7 +208,9 @@ void DetectorEffects::Loop(TString outfilename)
 	    dPhi_vs_MET_DilutedpT->Fill(result, pfMetRawPt);
 	    double dpt = DeltaPt_*GENJET_p4.Pt();
 	    dPhi_vs_METOverdpT_DilutedpT->Fill(result,pfMetRawPt/dpt);
-	    GenEM_vs_RecoEM_Dilute_dpT->Fill((*AK5genjetEM)[j]/GENJET_p4.Energy(), (*AK5jetPhoEF)[j]);
+	    Eta_vs_METOverdpT_DilutedpT->Fill(GENJET_p4.Eta(),pfMetRawPt/dpt);
+	      
+	      GenEM_vs_RecoEM_Dilute_dpT->Fill((*AK5genjetEM)[j]/GENJET_p4.Energy(), (*AK5jetPhoEF)[j]);
 	    GenHAD_vs_RecoHAD_Dilute_dpT->Fill((*AK5genjetHAD)[j]/GENJET_p4.Energy(), (*AK5jetCHadEF)[j] + (*AK5jetNHadEF)[j]);
 	    GenHAD_vs_RecoChHAD_Dilute_dpT->Fill((*AK5genjetHAD)[j]/GENJET_p4.Energy(), (*AK5jetCHadEF)[j]);
 	    if(true)	      std::cout<<info_runId
@@ -274,6 +288,7 @@ void DetectorEffects::Loop(TString outfilename)
   
   dPhi_vs_MET_DilutedpT                        ->Write();
   dPhi_vs_METOverdpT_DilutedpT                 ->Write();
+  Eta_vs_METOverdpT_DilutedpT                  ->Write();
   dPhi_vs_dpT                                  ->Write();
   dPhi_vs_MET                                  ->Write();
   GenEM_vs_RecoEM_Dilute_dPhi                  ->Write();
@@ -296,6 +311,12 @@ void DetectorEffects::Loop(TString outfilename)
   RecoNHadEF_p                                 ->Write();
   GenEM_p                                      ->Write();
   GenHad_p                                     ->Write();
+  
+  GenEM_Minus_RecoPho                           ->Write();
+  GenHad_Minus_RecoChHad                        ->Write();
+  GenHad_Minus_RecoHad                          ->Write();
+  MEM_vs_MHad                                   ->Write();
+  
   drmatched                                    ->Write();
   f->Close();
   std::cout<<" file closed and job finished"<<std::endl;
@@ -355,6 +376,7 @@ void DetectorEffects::MakeHistos(){
   dPhi_vs_MET_DilutedpT              = new TH2F("dPhi_vs_MET_DilutedpT","dPhi_vs_MET_DilutedpT;#Delta #phi; MET",100,-20,20,500,0,1000);
 
   dPhi_vs_METOverdpT_DilutedpT       = new TH2F("dPhi_vs_METOverdpT_DilutedpT","dPhi_vs_METOverdpT_DilutedpT;#Delta #phi; MET/#Delta p_{T}",100,-20,20,100,-1,1);
+  Eta_vs_METOverdpT_DilutedpT        = new TH2F("Eta_vs_METOverdpT_DilutedpT","Eta_vs_METOverdpT_DilutedpT;#eta; MET/#Delta p_{T}",70,-3.5,3.5,100,-1,1);
   
   GenEM_vs_RecoEM_Dilute_dPhi        = new TH2F("GenEM_vs_RecoEM_Dilute_dPhi","GenEM_vs_RecoEM_Dilute_dPhi;EM_{gen};EM_{reco}",100,0,1,100,0,1);
   GenHAD_vs_RecoHAD_Dilute_dPhi      = new TH2F("GenHAD_vs_RecoHAD_Dilute_dPhi","GenHAD_vs_RecoHAD_Dilute_dPhi;Had_{gen};Had_{reco}",100,0,1,100,0,1);
@@ -364,23 +386,31 @@ void DetectorEffects::MakeHistos(){
   GenHAD_vs_RecoHAD_Dilute_dpT       = new TH2F("GenHAD_vs_RecoHAD_Dilute_dpT","GenHAD_vs_RecoHAD_Dilute_dpT;Had_{gen};Had_{reco}",100,0,1,100,0,1);
   GenHAD_vs_RecoChHAD_Dilute_dpT     = new TH2F("GenHAD_vs_RecoChHAD_Dilute_dpT","GenHAD_vs_RecoChHAD_Dilute_dpT;Had_{gen};Had_{reco}",100,0,1,100,0,1);
 
-  RecoPhoEF   = new TH1F("RecoPhoEF","RecoPhoEF;RecoPhoEF;# of Events",20,0,1000.0);
-  RecoCEmEF   = new TH1F("RecoCEmEF","RecoCEmEF;RecoCEmEF;# of Events",20,0.,1000.);
-  RecoCHadEF  = new TH1F("RecoCHadEF","RecoCHadEF;RecoCHadEF;# of Events",20,0.,1000.);
-  RecoNEmEF   = new TH1F("RecoNEmEF","RecoNEmEF;RecoNEmEF;# of Events",20,0.,1000.);
-  RecoNHadEF  = new TH1F("RecoNHadEF","RecoNHadEF;RecoNHadEF;# of Events",20,0.,1000.);
-  GenEM       = new TH1F("GenEM","GenEM;GenEM;# of Events",20,0.,1000.);
-  GenHad      = new TH1F("GenHad","GenHad;GenHad;# of Events",20,0.,1000.);
+  RecoPhoEF   = new TH1F("RecoPhoEF","RecoPhoEF;RecoPhoEF;# of Events",30,0,1500.0);
+  RecoCEmEF   = new TH1F("RecoCEmEF","RecoCEmEF;RecoCEmEF;# of Events",30,0.,1500.);
+  RecoCHadEF  = new TH1F("RecoCHadEF","RecoCHadEF;RecoCHadEF;# of Events",30,0.,1500.);
+  RecoNEmEF   = new TH1F("RecoNEmEF","RecoNEmEF;RecoNEmEF;# of Events",30,0.,1500.);
+  RecoNHadEF  = new TH1F("RecoNHadEF","RecoNHadEF;RecoNHadEF;# of Events",30,0.,1500.);
+  GenEM       = new TH1F("GenEM","GenEM;GenEM;# of Events",30,0.,1500.);
+  GenHad      = new TH1F("GenHad","GenHad;GenHad;# of Events",30,0.,1500.);
 
 
 
-  RecoPhoEF_p   = new TProfile("RecoPhoEF_p","RecoPhoEF_p;p_{T}^{genJet};RecoPhoEF",24,0,1200,0,1000.);
-  RecoCEmEF_p   = new TProfile("RecoCEmEF_p","RecoCEmEF_p;p_{T}^{genJet};RecoCEmEF",24,0,1200,0,1000.);
-  RecoCHadEF_p  = new TProfile("RecoCHadEF_p","RecoCHadEF_p;p_{T}^{genJet};RecoCHadEF",24,0,1200,0,1000.);
-  RecoNEmEF_p   = new TProfile("RecoNEmEF_p","RecoNEmEF_p;p_{T}^{genJet};RecoNEmEF",24,0,1200,0,1000.);
-  RecoNHadEF_p  = new TProfile("RecoNHadEF_p","RecoNHadEF_p;p_{T}^{genJet};RecoNHadEF",24,0,1200,0,1000.);
-  GenEM_p       = new TProfile("GenEM_p","GenEM_p;p_{T}^{genJet};GenEM",24,0,1200,0,1000.);
-  GenHad_p      = new TProfile("GenHad_p","GenHad_p;p_{T}^{genJet};GenHad",24,0,1200,0,1000.);
+  RecoPhoEF_p   = new TProfile("RecoPhoEF_p","RecoPhoEF_p;p_{T}^{genJet};RecoPhoEF",30,0,1500,0,1.);
+  RecoCEmEF_p   = new TProfile("RecoCEmEF_p","RecoCEmEF_p;p_{T}^{genJet};RecoCEmEF",30,0,1500,0,1.);
+  RecoCHadEF_p  = new TProfile("RecoCHadEF_p","RecoCHadEF_p;p_{T}^{genJet};RecoCHadEF",30,0,1500,0,1.);
+  RecoNEmEF_p   = new TProfile("RecoNEmEF_p","RecoNEmEF_p;p_{T}^{genJet};RecoNEmEF",30,0,1500,0,1.);
+  RecoNHadEF_p  = new TProfile("RecoNHadEF_p","RecoNHadEF_p;p_{T}^{genJet};RecoNHadEF",30,0,1500,0,1.);
+  GenEM_p       = new TProfile("GenEM_p","GenEM_p;p_{T}^{genJet};GenEM",30,0,1500,0,1.);
+  GenHad_p      = new TProfile("GenHad_p","GenHad_p;p_{T}^{genJet};GenHad",30,0,1500,0,1.);
+  
+  GenEM_Minus_RecoPho    = new TH1F("GenEM_Minus_RecoPho","GenEM_Minus_RecoPho;EM_{gen-reco};# of Events",40,-1000,1000);
+  GenHad_Minus_RecoChHad = new TH1F("GenHad_Minus_RecoChHad","GenHad_Minus_RecoChHad;Had_{gen-ChReco};# of Events",40,-1000,1000);
+  GenHad_Minus_RecoHad   = new TH1F("GenHad_Minus_RecoHad","GenHad_Minus_RecoHad;Had_{gen-reco};# of Events",40,-1000,1000);
+
+  MEM_vs_MHad            = new TH2F("MEM_vs_MHad","MEM_vs_MHad;Missing EM energy;Missing Had Energy",40,-1000,1000,40,-1000,1000);
+  
+  
   
   drmatched   = new TH1F("drmatched","drmatched;#Delta R;# of Events",20,0,0.5);
 }
@@ -616,7 +646,7 @@ etaVec.push_back(-0.774);  phiVec.push_back( -2.278);
 etaVec.push_back(-0.774);  phiVec.push_back( -0.777);
 etaVec.push_back(-0.774);  phiVec.push_back( -0.759);
 etaVec.push_back(-0.774);  phiVec.push_back( -0.742);
-etaVec.push_back(-0.774);  phiVec.push_back( -0.724);
+etaVec.push_back(-0.774);  phiVec.push_back( -0.730);
 etaVec.push_back(-0.774);  phiVec.push_back( -0.707);
 etaVec.push_back(-0.757);  phiVec.push_back( -0.777);
 etaVec.push_back(-0.757);  phiVec.push_back( -0.759);
