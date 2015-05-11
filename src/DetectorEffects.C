@@ -94,10 +94,12 @@ void DetectorEffects::Loop(TString outfilename)
 	  
 	  drmatched->Fill((*AK5matchedDR)[j]);
 	  
-	  //bool isEventFound = FindEvent(GENJET_p4.Eta(), GENJET_p4.Phi());
-	  //bool isEventFound = (TMath::Abs (GENJET_p4.Eta()) > 1.2 ) && (TMath::Abs (GENJET_p4.Eta()) < 1.5 );
-	  //bool isEventFound = (TMath::Abs (GENJET_p4.Eta()) >  2.4 );
-	  //if(!isEventFound) continue; // this will fill only those events which are in vicinity of the ECAL Holes. 
+	  //bool isEventFound1 = FindEvent(GENJET_p4.Eta(), GENJET_p4.Phi());
+	  bool isEventFound2 = (TMath::Abs (GENJET_p4.Eta()) > 1.3 ) && (TMath::Abs (GENJET_p4.Eta()) < 1.5 );
+	  //bool isEventFound3 = (TMath::Abs (GENJET_p4.Eta()) >  2.4 );
+	  //if(isEventFound1) continue; // this will fill only those events which are in vicinity of the ECAL Holes. 
+	  if(!isEventFound2) continue; // this will fill only those events which are in vicinity of the ECAL Holes. 
+	  //if(isEventFound3) continue; // this will fill only those events which are in vicinity of the ECAL Holes. 
 	  
 	  
 	  //if( RECOJET_p4.Eta() > 2.4) continue;
