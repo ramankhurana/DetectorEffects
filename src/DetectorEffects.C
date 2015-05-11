@@ -186,19 +186,24 @@ void DetectorEffects::Loop(TString outfilename)
 	    GenHad_Minus_RecoHad   ->Fill(genhad - recoCHad - recoNHad);
 	    
 	    MEM_vs_MHad            ->Fill((genem - recopho), (genhad - recoCHad - recoNHad));
+	    genpt_vs_MEM         ->Fill((GENJET_p4.Pt()), (genem - recopho));
+	    geneta_vs_MEM         ->Fill((GENJET_p4.Eta()), (genem - recopho));
+	    genpt_vs_MHad        ->Fill((GENJET_p4.Pt()), (genhad - recoCHad -recoNHad));
+	    geneta_vs_MHad        ->Fill((GENJET_p4.Eta()), (genhad - recoCHad -recoNHad));
+	    
 	    // Fill Profiles 
 	    // Fill th energy fractions for reco jets
 	    float genpt = GENJET_p4.Pt();
-	    RecoPhoEF_p   ->Fill(genpt,(*AK5jetPhoEF)[j]);
-	    RecoCEmEF_p   ->Fill(genpt,(*AK5jetCEmEF)[j]);
-	    RecoCHadEF_p  ->Fill(genpt,(*AK5jetCHadEF)[j]);
-	    RecoNEmEF_p   ->Fill(genpt,(*AK5jetNEmEF)[j]);
-	    RecoNHadEF_p  ->Fill(genpt,(*AK5jetNHadEF)[j]);
-	    
+	    RecoPhoEF_p   ->Fill(genpt,(*AK5jetPhoEF)[j]*energy);
+	    RecoCEmEF_p   ->Fill(genpt,(*AK5jetCEmEF)[j]*energy);
+	    RecoCHadEF_p  ->Fill(genpt,(*AK5jetCHadEF)[j]*energy);
+	    RecoNEmEF_p   ->Fill(genpt,(*AK5jetNEmEF)[j]*energy);
+	    RecoNHadEF_p  ->Fill(genpt,(*AK5jetNHadEF)[j]*energy);
+	    RecoHad_p     ->Fill(genpt,((*AK5jetNHadEF)[j]*energy) + ((*AK5jetCHadEF)[j]*energy) );
 	    // Fill energy fractions for gen jets
 	    float genen = GENJET_p4.Energy();
-	    GenEM_p       ->Fill(genpt,(*AK5genjetEM)[j]/genen);
-	    GenHad_p      ->Fill(genpt,(*AK5genjetHAD)[j]/genen);
+	    GenEM_p       ->Fill(genpt,(*AK5genjetEM)[j]);
+	    GenHad_p      ->Fill(genpt,(*AK5genjetHAD)[j]);
 	    
 	    
 	    
@@ -311,13 +316,20 @@ void DetectorEffects::Loop(TString outfilename)
   RecoNHadEF_p                                 ->Write();
   GenEM_p                                      ->Write();
   GenHad_p                                     ->Write();
+  RecoHad_p                                    ->Write();
   
-  GenEM_Minus_RecoPho                           ->Write();
-  GenHad_Minus_RecoChHad                        ->Write();
-  GenHad_Minus_RecoHad                          ->Write();
-  MEM_vs_MHad                                   ->Write();
+  GenEM_Minus_RecoPho                          ->Write();
+  GenHad_Minus_RecoChHad                       ->Write();
+  GenHad_Minus_RecoHad                         ->Write();
+  MEM_vs_MHad                                  ->Write();
+  genpt_vs_MEM                                 ->Write();
+  geneta_vs_MEM                                ->Write();
+  genpt_vs_MHad                                ->Write();
+  geneta_vs_MHad                               ->Write();
   
   drmatched                                    ->Write();
+
+  
   f->Close();
   std::cout<<" file closed and job finished"<<std::endl;
 }
@@ -396,13 +408,14 @@ void DetectorEffects::MakeHistos(){
 
 
 
-  RecoPhoEF_p   = new TProfile("RecoPhoEF_p","RecoPhoEF_p;p_{T}^{genJet};RecoPhoEF",30,0,1500,0,1.);
-  RecoCEmEF_p   = new TProfile("RecoCEmEF_p","RecoCEmEF_p;p_{T}^{genJet};RecoCEmEF",30,0,1500,0,1.);
-  RecoCHadEF_p  = new TProfile("RecoCHadEF_p","RecoCHadEF_p;p_{T}^{genJet};RecoCHadEF",30,0,1500,0,1.);
-  RecoNEmEF_p   = new TProfile("RecoNEmEF_p","RecoNEmEF_p;p_{T}^{genJet};RecoNEmEF",30,0,1500,0,1.);
-  RecoNHadEF_p  = new TProfile("RecoNHadEF_p","RecoNHadEF_p;p_{T}^{genJet};RecoNHadEF",30,0,1500,0,1.);
-  GenEM_p       = new TProfile("GenEM_p","GenEM_p;p_{T}^{genJet};GenEM",30,0,1500,0,1.);
-  GenHad_p      = new TProfile("GenHad_p","GenHad_p;p_{T}^{genJet};GenHad",30,0,1500,0,1.);
+  RecoPhoEF_p   = new TProfile("RecoPhoEF_p","RecoPhoEF_p;p_{T}^{genJet};RecoPhoEF",30,0,1500,0,1200.);
+  RecoCEmEF_p   = new TProfile("RecoCEmEF_p","RecoCEmEF_p;p_{T}^{genJet};RecoCEmEF",30,0,1500,0,1200.);
+  RecoCHadEF_p  = new TProfile("RecoCHadEF_p","RecoCHadEF_p;p_{T}^{genJet};RecoCHadEF",30,0,1500,0,1200.);
+  RecoNEmEF_p   = new TProfile("RecoNEmEF_p","RecoNEmEF_p;p_{T}^{genJet};RecoNEmEF",30,0,1500,0,1200.);
+  RecoNHadEF_p  = new TProfile("RecoNHadEF_p","RecoNHadEF_p;p_{T}^{genJet};RecoNHadEF",30,0,1500,0,1200.);
+  GenEM_p       = new TProfile("GenEM_p","GenEM_p;p_{T}^{genJet};GenEM",30,0,1500,0,1200.);
+  GenHad_p      = new TProfile("GenHad_p","GenHad_p;p_{T}^{genJet};GenHad",30,0,1500,0,1200.);
+  RecoHad_p     = new TProfile("RecoHad_p","RecoHad_p;p_{T}^{genJet};RecoHad",30,0,1500,0,1200.);
   
   GenEM_Minus_RecoPho    = new TH1F("GenEM_Minus_RecoPho","GenEM_Minus_RecoPho;EM_{gen-reco};# of Events",40,-1000,1000);
   GenHad_Minus_RecoChHad = new TH1F("GenHad_Minus_RecoChHad","GenHad_Minus_RecoChHad;Had_{gen-ChReco};# of Events",40,-1000,1000);
@@ -410,6 +423,10 @@ void DetectorEffects::MakeHistos(){
 
   MEM_vs_MHad            = new TH2F("MEM_vs_MHad","MEM_vs_MHad;Missing EM energy;Missing Had Energy",40,-1000,1000,40,-1000,1000);
   
+  genpt_vs_MEM            = new TH2F("genpt_vs_MEM","genpt_vs_MEM;p_{T}^{gen-Jet};Missing EME",30,0,1500,30,0,1500);
+  geneta_vs_MEM           = new TH2F("geneta_vs_MEM","geneta_vs_MEM;#eta_{gen-Jet};Missing EME",70,-3.5,3.5,30,0,1500);
+  genpt_vs_MHad           = new TH2F("genpt_vs_MHad","genpt_vs_MHad;p_{T}^{gen-Jet};Missing HE",30,0,1500,30,0,1500);
+  geneta_vs_MHad          = new TH2F("geneta_vs_MHad","geneta_vs_MHad;#eta_{gen-Jet};Missing HE",70,-3.5,3.5,30,0,1500);
   
   
   drmatched   = new TH1F("drmatched","drmatched;#Delta R;# of Events",20,0,0.5);

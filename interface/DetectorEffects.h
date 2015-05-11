@@ -129,9 +129,14 @@ public :
    TProfile* RecoCHadEF_p;
    TProfile* RecoNEmEF_p;
    TProfile* RecoNHadEF_p;
+   TProfile* RecoHad_p;
    TProfile* GenEM_p;
    TProfile* GenHad_p;
 
+   TH2F* genpt_vs_MEM;   
+   TH2F* geneta_vs_MEM;   
+   TH2F* genpt_vs_MHad;   
+   TH2F* geneta_vs_MHad;   
    TH1F* drmatched;
    
    // Declaration of leaf types
