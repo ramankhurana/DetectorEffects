@@ -39,17 +39,22 @@ void DetectorEffects::Loop(TString outfilename)
     nb = fChain->GetEntry(jentry);   nbytes += nb;
 
     if(debug) std::cout<< "n muons = "<<genjetngenMuons<<std::endl;
+    if(pfpatgenMetPt_ > 30) continue;
     if( genjetngenMuons ==2 ) {
       //if(true){
       
       int ntaus=0;
       int nmuons=0;
       int neles=0;
+      double sumpt=0;
       for (auto ipart=0; ipart < (*genParId).size(); ipart++){
 	if ( (*genParId)[ipart] == 15 || (*genParId)[ipart] == -15 ) 	ntaus++;
 	if ( (*genParId)[ipart] == 13 || (*genParId)[ipart] == -13 ) 	nmuons++;
 	if ( (*genParId)[ipart] == 11 || (*genParId)[ipart] == -11 ) 	neles++;
+	if( (*genParId)[ipart] == 12 || (*genParId)[ipart] == 14 || (*genParId)[ipart] == 16) sumpt += (*genParPt)[ipart] ;
+	if( (*genParId)[ipart] == -12 || (*genParId)[ipart] == -14 || (*genParId)[ipart] == -16) sumpt += (*genParPt)[ipart] ;
       }
+      std::cout<<" --------- sum pt = "<<sumpt<<std::endl;
       
       if ( ntaus  == 0 ){
 	//if(!(ntaus==0 && nmuons==0 && neles==0)){
@@ -94,13 +99,29 @@ void DetectorEffects::Loop(TString outfilename)
 	  
 	  drmatched->Fill((*AK5matchedDR)[j]);
 	  
-	  //bool isEventFound1 = FindEvent(GENJET_p4.Eta(), GENJET_p4.Phi());
-	  bool isEventFound2 = (TMath::Abs (GENJET_p4.Eta()) > 1.3 ) && (TMath::Abs (GENJET_p4.Eta()) < 1.5 );
+	  // For eta : 1.2 to 1.5
+	  //bool isEventFound2 = (TMath::Abs (GENJET_p4.Eta()) > 1.2 ) && (TMath::Abs (GENJET_p4.Eta()) < 1.5 );
+	  //if(!isEventFound2) continue; 
+	  
+	  //For eta > 2.4
 	  //bool isEventFound3 = (TMath::Abs (GENJET_p4.Eta()) >  2.4 );
-	  //if(isEventFound1) continue; // this will fill only those events which are in vicinity of the ECAL Holes. 
-	  if(!isEventFound2) continue; // this will fill only those events which are in vicinity of the ECAL Holes. 
+	  //if(!isEventFound3) continue; 
+	  
+	  // For ECAl Holes
+	  //bool isEventFound1 = FindEvent(GENJET_p4.Eta(), GENJET_p4.Phi());
+	  //bool isEventFound2 = (TMath::Abs (GENJET_p4.Eta()) > 1.2 ) && (TMath::Abs (GENJET_p4.Eta()) < 1.5 );
+	  //bool isEventFound3 = (TMath::Abs (GENJET_p4.Eta()) >  2.4 );
+	  //if(!isEventFound1) continue; // this will fill only those events which are in vicinity of the ECAL Holes. 
+	  //if(isEventFound2) continue; // this will fill only those events which are in vicinity of the ECAL Holes. 
 	  //if(isEventFound3) continue; // this will fill only those events which are in vicinity of the ECAL Holes. 
 	  
+	  // For all remaining 
+	  //bool isEventFound1 = FindEvent(GENJET_p4.Eta(), GENJET_p4.Phi());
+	  //bool isEventFound2 = (TMath::Abs (GENJET_p4.Eta()) > 1.2 ) && (TMath::Abs (GENJET_p4.Eta()) < 1.5 );
+	  //bool isEventFound3 = (TMath::Abs (GENJET_p4.Eta()) >  2.4 );
+	  //if(isEventFound1) continue; // this will fill only those events which are in vicinity of the ECAL Holes. 
+	  //if(isEventFound2) continue; // this will fill only those events which are in vicinity of the ECAL Holes. 
+	  //if(isEventFound3) continue; // this will fill only those events which are in vicinity of the ECAL Holes. 
 	  
 	  //if( RECOJET_p4.Eta() > 2.4) continue;
 	  //if( RECOJET_p4.Eta() < -2.4) continue;
@@ -182,10 +203,17 @@ void DetectorEffects::Loop(TString outfilename)
 	    float recoNHad   = (*AK5jetNHadEF)[j]*energy; 
 	    float genem       = (*AK5genjetEM)[j];
 	    float genhad      = (*AK5genjetHAD)[j];
+	    float genchhad    = (*AK5genjetChHad)[j];
+	    float genmu       = (*AK5genjetMu)[j];
+	    float recomu      = (*AK5jetMuEF)[j]*energy;
+	    if(genmu==-999.) genmu=0.;
+	    if(genchhad=-999.) genchhad=0.;
 	    
-	    GenEM_Minus_RecoPho    ->Fill(genem - recopho);
-	    GenHad_Minus_RecoChHad ->Fill(genhad - recoCHad);
-	    GenHad_Minus_RecoHad   ->Fill(genhad - recoCHad - recoNHad);
+	    GenEM_Minus_RecoPho         ->Fill(genem    - recopho)            ;
+	    GenHad_Minus_RecoChHad      ->Fill(genhad   - recoCHad)           ;
+	    GenHad_Minus_RecoHad        ->Fill(genhad   - recoCHad - recoNHad);
+	    GenMu_Minus_RecoMu          ->Fill(genmu    - recomu)             ;
+	    GenChHad_Minus_RecoChHad    ->Fill(genchhad - recoCHad)           ;
 	    
 	    MEM_vs_MHad            ->Fill((genem - recopho), (genhad - recoCHad - recoNHad));
 	    genpt_vs_MEM         ->Fill((GENJET_p4.Pt()), (genem - recopho));
@@ -210,14 +238,16 @@ void DetectorEffects::Loop(TString outfilename)
 	    
 	    
 	    //
+	    genmet->Fill(pfpatgenMetPt_);
+	    eta_vs_genmet->Fill(GENJET_p4.Eta(),pfpatgenMetPt_);
 	    eta_vs_phi_profile_dPt_DilutedpT->Fill(GENJET_p4.Eta(), GENJET_p4.Phi(), DeltaPt_);
 	    dPhi_MET_Jet->Fill(result);
 	    dPhi_vs_MET_DilutedpT->Fill(result, pfMetRawPt);
 	    double dpt = DeltaPt_*GENJET_p4.Pt();
 	    dPhi_vs_METOverdpT_DilutedpT->Fill(result,pfMetRawPt/dpt);
 	    Eta_vs_METOverdpT_DilutedpT->Fill(GENJET_p4.Eta(),pfMetRawPt/dpt);
-	      
-	      GenEM_vs_RecoEM_Dilute_dpT->Fill((*AK5genjetEM)[j]/GENJET_p4.Energy(), (*AK5jetPhoEF)[j]);
+	    
+	    GenEM_vs_RecoEM_Dilute_dpT->Fill((*AK5genjetEM)[j]/GENJET_p4.Energy(), (*AK5jetPhoEF)[j]);
 	    GenHAD_vs_RecoHAD_Dilute_dpT->Fill((*AK5genjetHAD)[j]/GENJET_p4.Energy(), (*AK5jetCHadEF)[j] + (*AK5jetNHadEF)[j]);
 	    GenHAD_vs_RecoChHAD_Dilute_dpT->Fill((*AK5genjetHAD)[j]/GENJET_p4.Energy(), (*AK5jetCHadEF)[j]);
 	    if(true)	      std::cout<<info_runId
@@ -235,7 +265,8 @@ void DetectorEffects::Loop(TString outfilename)
 	MET_vs_SumdPt->Fill(pfMetRawPt,sumdPt);
 	SumdpT->Fill(sumdPt);
 	MET->Fill(pfMetRawPt);
-		
+
+	
 	// Fill New Branches;
 	MET_ = (float) pfMetRawPt;
 	HT_ = (float) HT;
@@ -273,6 +304,8 @@ void DetectorEffects::Loop(TString outfilename)
   
   delta                                        ->Write();
   MET                                          ->Write();
+  genmet                                       ->Write();
+  eta_vs_genmet                                ->Write();
   SumdpT                                       ->Write();
   			                     
   dpT                                          ->Write();
@@ -323,6 +356,8 @@ void DetectorEffects::Loop(TString outfilename)
   GenEM_Minus_RecoPho                          ->Write();
   GenHad_Minus_RecoChHad                       ->Write();
   GenHad_Minus_RecoHad                         ->Write();
+  GenMu_Minus_RecoMu                           ->Write();
+  GenChHad_Minus_RecoChHad                     ->Write();
   MEM_vs_MHad                                  ->Write();
   genpt_vs_MEM                                 ->Write();
   geneta_vs_MEM                                ->Write();
@@ -359,6 +394,8 @@ void DetectorEffects::MakeBranches(){
 void DetectorEffects::MakeHistos(){
   delta                       = new TH1F("delta","delta;(p_{T}^{genJet}-p_{T}^{recoJet})/p_{T}^{genJet};# of entries",120,-3,3.);
   MET                         = new TH1F("MET","MET;MET;# of events", 750, 0,1500);
+  genmet                      = new TH1F("genmet","genmet;genmet;# of events",750,0,1500);
+  eta_vs_genmet               = new TH2F("eta_vs_genmet","eta_vs_genmet;eta;genmet",70,-3.5,3.5,750,0,1500);
   SumdpT                      = new TH1F("SumdpT","SumdpT;#Sigma #Delta p_{T};# of Events",500,-1000,1000);
   dpT                         = new TH1F("dpT","dpT; #Delta p_{T};# of Events",500,-1000,1000);
   dPhi_MET_Jet                = new TH1F("dPhi_MET_Jet","dPhi_MET_Jet;#Delta #phi (MET,jet);# of Events", 100,-20,20);
@@ -422,6 +459,10 @@ void DetectorEffects::MakeHistos(){
   GenEM_Minus_RecoPho    = new TH1F("GenEM_Minus_RecoPho","GenEM_Minus_RecoPho;EM_{gen-reco};# of Events",40,-1000,1000);
   GenHad_Minus_RecoChHad = new TH1F("GenHad_Minus_RecoChHad","GenHad_Minus_RecoChHad;Had_{gen-ChReco};# of Events",40,-1000,1000);
   GenHad_Minus_RecoHad   = new TH1F("GenHad_Minus_RecoHad","GenHad_Minus_RecoHad;Had_{gen-reco};# of Events",40,-1000,1000);
+  
+  GenMu_Minus_RecoMu     = new TH1F("GenMu_Minus_RecoMu","GenMu_Minus_RecoMu;E^{Mu}_{gen-reco};# of Events",40,-1000,1000);
+  GenChHad_Minus_RecoChHad= new TH1F("GenChHad_Minus_RecoChHad","GenChHad_Minus_RecoChHad;ChHad_{gen-reco};# of Events",40,-1000,1000);
+  
 
   MEM_vs_MHad            = new TH2F("MEM_vs_MHad","MEM_vs_MHad;Missing EM energy;Missing Had Energy",40,-1000,1000,40,-1000,1000);
   

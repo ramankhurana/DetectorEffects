@@ -29,6 +29,8 @@ const Int_t kMaxpfmvaMetPt = 1;
 const Int_t kMaxpfmvaMetPhi = 1;
 const Int_t kMaxpfmvaMetSumEt = 1;
 const Int_t kMaxpfmvaMetSig = 1;
+const Int_t kMaxpfpatgenMetPhi = 1;
+const Int_t kMaxpfpatgenMetPt = 1;
 using namespace std;
 class DetectorEffects {
 public :
@@ -43,6 +45,9 @@ public :
    Float_t MET_;
    Float_t HT_;
    Float_t SumdpT_;
+   
+   TH1F* genmet;
+   TH2F* eta_vs_genmet;
    std::vector<double> dpT_;
    std::vector<double> dpT_Over_pT_;
    std::vector<double> GenJetpT_;
@@ -121,7 +126,8 @@ public :
    TH1F* GenEM_Minus_RecoPho;
    TH1F* GenHad_Minus_RecoChHad;
    TH1F* GenHad_Minus_RecoHad;
-   
+   TH1F* GenMu_Minus_RecoMu;
+   TH1F* GenChHad_Minus_RecoChHad;
    TH2F* MEM_vs_MHad;
    
    TProfile* RecoPhoEF_p;
@@ -220,6 +226,9 @@ public :
    Float_t         pfmvaMetPhi_;
    Float_t         pfmvaMetSumEt_;
    Float_t         pfmvaMetSig_;
+   Float_t         pfpatgenMetPhi_;
+   Float_t         pfpatgenMetPt_;
+
    Int_t           CA8nJet;
    vector<float>   *CA8jetPt;
    vector<float>   *CA8jetEta;
@@ -288,6 +297,8 @@ public :
    vector<float>   *AK5genjetHAD;
    vector<float>   *AK5genjetINV;
    vector<float>   *AK5genjetAUX;
+   vector<float>   *AK5genjetMu;
+   vector<float>   *AK5genjetChHad;
    vector<float>   *AK5matchedDR;
    vector<float>   *AK5jetCorrUncUp;
    vector<float>   *AK5jetCorrUncDown;
@@ -396,6 +407,9 @@ public :
    TBranch        *b_pfmvaMetPhi_;   //!
    TBranch        *b_pfmvaMetSumEt_;   //!
    TBranch        *b_pfmvaMetSig_;   //!
+   TBranch        *b_pfpatgenMetPhi_;   //!                                                                                                                                              
+   TBranch        *b_pfpatgenMetPt_;   //!                                                                                                                                               
+
    TBranch        *b_CA8nJet;   //!
    TBranch        *b_CA8jetPt;   //!
    TBranch        *b_CA8jetEta;   //!
@@ -464,6 +478,8 @@ public :
    TBranch        *b_AK5genjetHAD;   //!
    TBranch        *b_AK5genjetINV;   //!
    TBranch        *b_AK5genjetAUX;   //!
+   TBranch        *b_AK5genjetMu;   //!
+   TBranch        *b_AK5genjetChHad;   
    TBranch        *b_AK5matchedDR;   //!
    TBranch        *b_AK5jetCorrUncUp;   //!
    TBranch        *b_AK5jetCorrUncDown;   //!
@@ -682,6 +698,8 @@ void DetectorEffects::Init(TTree *tree)
    AK5genjetHAD = 0;
    AK5genjetINV = 0;
    AK5genjetAUX = 0;
+   AK5genjetMu = 0;
+   AK5genjetChHad = 0;
    AK5matchedDR = 0;
    AK5jetCorrUncUp = 0;
    AK5jetCorrUncDown = 0;
@@ -791,6 +809,9 @@ void DetectorEffects::Init(TTree *tree)
    fChain->SetBranchAddress("pfmvaMetPhi_", &pfmvaMetPhi_, &b_pfmvaMetPhi_);
    fChain->SetBranchAddress("pfmvaMetSumEt_", &pfmvaMetSumEt_, &b_pfmvaMetSumEt_);
    fChain->SetBranchAddress("pfmvaMetSig_", &pfmvaMetSig_, &b_pfmvaMetSig_);
+   fChain->SetBranchAddress("pfpatgenMetPhi_", &pfpatgenMetPhi_, &b_pfpatgenMetPhi_);
+   fChain->SetBranchAddress("pfpatgenMetPt_", &pfpatgenMetPt_, &b_pfpatgenMetPt_);
+
    fChain->SetBranchAddress("CA8nJet", &CA8nJet, &b_CA8nJet);
    fChain->SetBranchAddress("CA8jetPt", &CA8jetPt, &b_CA8jetPt);
    fChain->SetBranchAddress("CA8jetEta", &CA8jetEta, &b_CA8jetEta);
@@ -860,6 +881,8 @@ void DetectorEffects::Init(TTree *tree)
    fChain->SetBranchAddress("AK5genjetHAD", &AK5genjetHAD, &b_AK5genjetHAD);
    fChain->SetBranchAddress("AK5genjetINV", &AK5genjetINV, &b_AK5genjetINV);
    fChain->SetBranchAddress("AK5genjetAUX", &AK5genjetAUX, &b_AK5genjetAUX);
+   fChain->SetBranchAddress("AK5genjetMu", &AK5genjetMu, &b_AK5genjetMu);
+   fChain->SetBranchAddress("AK5genjetHAD", &AK5genjetHAD, &b_AK5genjetHAD);
    fChain->SetBranchAddress("AK5matchedDR", &AK5matchedDR, &b_AK5matchedDR);
    fChain->SetBranchAddress("AK5jetCorrUncUp", &AK5jetCorrUncUp, &b_AK5jetCorrUncUp);
    fChain->SetBranchAddress("AK5jetCorrUncDown", &AK5jetCorrUncDown, &b_AK5jetCorrUncDown);
