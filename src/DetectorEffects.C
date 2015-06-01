@@ -104,8 +104,8 @@ void DetectorEffects::Loop(TString outfilename)
 	  //if(!isEventFound2) continue; 
 	  
 	  //For eta > 2.4
-	  //bool isEventFound3 = (TMath::Abs (GENJET_p4.Eta()) >  2.4 );
-	  //if(!isEventFound3) continue; 
+	  bool isEventFound3 = (TMath::Abs (GENJET_p4.Eta()) >  2.4 );
+	  if(!isEventFound3) continue; 
 	  
 	  // For ECAl Holes
 	  //bool isEventFound1 = FindEvent(GENJET_p4.Eta(), GENJET_p4.Phi());
@@ -185,7 +185,7 @@ void DetectorEffects::Loop(TString outfilename)
 	  // Dilute with dpT > 200 GeV && MET > 200 GeV
 	  if( (DeltaPt_*GENJET_p4.Pt()) > 200.0 && pfMetRawPt > 200.0) { 
 	    //  if( (DeltaPt_*GENJET_p4.Pt()) > 50.0) { 
-	    
+	    pTRes        ->Fill(RECOJET_p4.Pt()/GENJET_p4.Pt());
 	    // Fill th energy fractions for reco jets
 	    float energy = RECOJET_p4.Energy();
 	    RecoPhoEF   ->Fill((*AK5jetPhoEF)[j]*energy);
@@ -203,17 +203,17 @@ void DetectorEffects::Loop(TString outfilename)
 	    float recoNHad   = (*AK5jetNHadEF)[j]*energy; 
 	    float genem       = (*AK5genjetEM)[j];
 	    float genhad      = (*AK5genjetHAD)[j];
-	    float genchhad    = (*AK5genjetChHad)[j];
-	    float genmu       = (*AK5genjetMu)[j];
+	    //float genchhad    = (*AK5genjetChHad)[j];
+	    //float genmu       = (*AK5genjetMu)[j];
 	    float recomu      = (*AK5jetMuEF)[j]*energy;
-	    if(genmu==-999.) genmu=0.;
-	    if(genchhad=-999.) genchhad=0.;
+	    //if(genmu==-999.) genmu=0.;
+	    //if(genchhad=-999.) genchhad=0.;
 	    
 	    GenEM_Minus_RecoPho         ->Fill(genem    - recopho)            ;
 	    GenHad_Minus_RecoChHad      ->Fill(genhad   - recoCHad)           ;
 	    GenHad_Minus_RecoHad        ->Fill(genhad   - recoCHad - recoNHad);
-	    GenMu_Minus_RecoMu          ->Fill(genmu    - recomu)             ;
-	    GenChHad_Minus_RecoChHad    ->Fill(genchhad - recoCHad)           ;
+	    //GenMu_Minus_RecoMu          ->Fill(genmu    - recomu)             ;
+	    //GenChHad_Minus_RecoChHad    ->Fill(genchhad - recoCHad)           ;
 	    
 	    MEM_vs_MHad            ->Fill((genem - recopho), (genhad - recoCHad - recoNHad));
 	    genpt_vs_MEM         ->Fill((GENJET_p4.Pt()), (genem - recopho));
@@ -307,7 +307,8 @@ void DetectorEffects::Loop(TString outfilename)
   genmet                                       ->Write();
   eta_vs_genmet                                ->Write();
   SumdpT                                       ->Write();
-  			                     
+  
+  pTRes                                        ->Write();
   dpT                                          ->Write();
   deltapt_vs_eta                               ->Write();
   deltapt_vs_phi                               ->Write();
@@ -392,6 +393,7 @@ void DetectorEffects::MakeBranches(){
 
 
 void DetectorEffects::MakeHistos(){
+  pTRes                       = new TH1F("pTRes","pTRes;p_{T}^{reco}/p_{T}^{gen};# of events",400,-10,10);
   delta                       = new TH1F("delta","delta;(p_{T}^{genJet}-p_{T}^{recoJet})/p_{T}^{genJet};# of entries",120,-3,3.);
   MET                         = new TH1F("MET","MET;MET;# of events", 750, 0,1500);
   genmet                      = new TH1F("genmet","genmet;genmet;# of events",750,0,1500);

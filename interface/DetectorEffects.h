@@ -68,6 +68,7 @@ public :
    TLorentzVector GENJET_p4;
 
    
+   TH1F* pTRes;
    TH1F* delta;
    TH1F* MET;
    TH1F* SumdpT;
@@ -297,8 +298,8 @@ public :
    vector<float>   *AK5genjetHAD;
    vector<float>   *AK5genjetINV;
    vector<float>   *AK5genjetAUX;
-   vector<float>   *AK5genjetMu;
-   vector<float>   *AK5genjetChHad;
+   //vector<float>   *AK5genjetMu;
+   //vector<float>   *AK5genjetChHad;
    vector<float>   *AK5matchedDR;
    vector<float>   *AK5jetCorrUncUp;
    vector<float>   *AK5jetCorrUncDown;
@@ -478,8 +479,8 @@ public :
    TBranch        *b_AK5genjetHAD;   //!
    TBranch        *b_AK5genjetINV;   //!
    TBranch        *b_AK5genjetAUX;   //!
-   TBranch        *b_AK5genjetMu;   //!
-   TBranch        *b_AK5genjetChHad;   
+   //TBranch        *b_AK5genjetMu;   //!
+   //TBranch        *b_AK5genjetChHad;   
    TBranch        *b_AK5matchedDR;   //!
    TBranch        *b_AK5jetCorrUncUp;   //!
    TBranch        *b_AK5jetCorrUncDown;   //!
@@ -698,8 +699,8 @@ void DetectorEffects::Init(TTree *tree)
    AK5genjetHAD = 0;
    AK5genjetINV = 0;
    AK5genjetAUX = 0;
-   AK5genjetMu = 0;
-   AK5genjetChHad = 0;
+   //AK5genjetMu = 0;
+   //AK5genjetChHad = 0;
    AK5matchedDR = 0;
    AK5jetCorrUncUp = 0;
    AK5jetCorrUncDown = 0;
@@ -881,8 +882,8 @@ void DetectorEffects::Init(TTree *tree)
    fChain->SetBranchAddress("AK5genjetHAD", &AK5genjetHAD, &b_AK5genjetHAD);
    fChain->SetBranchAddress("AK5genjetINV", &AK5genjetINV, &b_AK5genjetINV);
    fChain->SetBranchAddress("AK5genjetAUX", &AK5genjetAUX, &b_AK5genjetAUX);
-   fChain->SetBranchAddress("AK5genjetMu", &AK5genjetMu, &b_AK5genjetMu);
-   fChain->SetBranchAddress("AK5genjetHAD", &AK5genjetHAD, &b_AK5genjetHAD);
+   //fChain->SetBranchAddress("AK5genjetMu", &AK5genjetMu, &b_AK5genjetMu);
+   //fChain->SetBranchAddress("AK5genjetHAD", &AK5genjetHAD, &b_AK5genjetHAD);
    fChain->SetBranchAddress("AK5matchedDR", &AK5matchedDR, &b_AK5matchedDR);
    fChain->SetBranchAddress("AK5jetCorrUncUp", &AK5jetCorrUncUp, &b_AK5jetCorrUncUp);
    fChain->SetBranchAddress("AK5jetCorrUncDown", &AK5jetCorrUncDown, &b_AK5jetCorrUncDown);
