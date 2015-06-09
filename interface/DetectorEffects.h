@@ -67,6 +67,11 @@ public :
    TLorentzVector RECOJET_p4;
    TLorentzVector GENJET_p4;
 
+   TProfile2D* eta_vs_phi;
+   TProfile2D* eta_vs_phi_dEM_dilutept_p;
+   TProfile2D* eta_vs_phi_dEM_dilutept_m;
+   TProfile2D* eta_vs_phi_dHad_dilutept_p;
+   TProfile2D* eta_vs_phi_dHad_dilutept_m;
    
    TH1F* pTRes;
    TH1F* delta;
@@ -75,6 +80,9 @@ public :
    TH1F* dpT;
 
    TH1F* dPhi_MET_Jet;
+   
+   TH2F* dPhi_vs_dEM;
+   TH2F* dPhi_vs_dHad;
    
    TH2F* dPhi_vs_MET_DilutedpT;
    TH2F* dPhi_vs_METOverdpT_DilutedpT;
@@ -517,7 +525,7 @@ public :
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
-   virtual void     Loop(TString outputfilename);
+   virtual void     Loop(TString outputfilename, TString mode);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
    void MakeBranches();

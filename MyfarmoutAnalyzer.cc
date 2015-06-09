@@ -32,8 +32,8 @@ int main(){
   
 
   /// Loop through lines in file (paths to .root files)
-      // and add to TChain
-      TString infileName = ""; 
+  // and add to TChain
+  TString infileName = ""; 
   while( !inputList.eof() ) { 
     infileName="";
     inputList >> infileName;
@@ -46,8 +46,13 @@ int main(){
   DetectorEffects detEffects;
   // Initialize and run analyzer on TChain
   detEffects.Init(theChain);
-  detEffects.Loop(outfileName);
-    
+  
+  detEffects.Loop(outfileName,"ECALHoles");
+  detEffects.Loop(outfileName,"NoECALHoles");
+  detEffects.Loop(outfileName,"Eta12");
+  detEffects.Loop(outfileName,"Eta24");
+  detEffects.Loop(outfileName,"All");
+  
   time(&end);
   std::cout<<" time used is = "<<-(start-end)<<" seconds"<<std::endl;
   
